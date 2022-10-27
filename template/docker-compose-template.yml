@@ -1,0 +1,42 @@
+version: '3.7'
+
+volumes:
+  caddy-volume:
+  xray-volume:
+
+services:
+  caddy:
+    # build:
+    #   context: ./caddy-docker
+    image: bigfoxtail/caddy
+    profiles: ["http"]
+    container_name: caddy
+    restart: "always"
+    ports:
+      - '80:80'
+    volumes:
+      - ./site:/site
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./caddy_data:/data
+      - caddy-volume:/config
+
+  xray:
+    image: teddysun/xray
+    container_name: xray
+    restart: "always"
+    ports:
+      - '443:443'
+      - '8083:8083'
+      - '8083:8083/udp'
+      - '14443:443'
+      - '24443:443'
+      - '34443:443'
+      - '44443:443'
+      - '54443:443'
+      - '64443:443'
+    volumes:
+      - Xray_CERTPATH:/config/certificates
+      - ./xray_run.sh:/etc/xray/xray_run.sh
+      - ./xray_server.json:/etc/xray/config.json
+      - xray-volume:/etc/xray
+    command: /etc/xray/xray_run.sh

@@ -1,0 +1,243 @@
+{
+    "log": {
+        "loglevel": "warning",
+        "access": "/var/log/xray_access.log",
+        "error": "/var/log/xray_error.log"
+    },
+    "dns": {
+        "servers": [
+            "https+local://1.1.1.1/dns-query",
+            "localhost"
+        ]
+    },
+    "routing": {
+        "domainStrategy": "AsIs",
+        "rules": [
+            {
+                "type": "field",
+                "domain": [
+                    "geosite:category-ads-all"
+                ],
+                "outboundTag": "blocked"
+            }
+        ],
+        "balancers": []
+    },
+    "inbounds": [
+        {
+            "port": 443,
+            "protocol": "vless",
+            "settings": {
+                "clients": [
+                    {
+                        "id": "Xray_UUID",
+                        "flow": "xtls-rprx-direct",
+                        "level": 0
+                    }
+                ],
+                "decryption": "none",
+                "fallbacks": [
+                    {
+                        "dest": "@/tmp/xray_trojan.sock"
+                    },
+                    {
+                        "path": "/line",
+                        "dest": "@/tmp/xray_ws.sock"
+                    },
+                    {
+                        "path": "/websocket",
+                        "dest": "@/tmp/xray_websocket.sock"
+                    },
+                    {
+                        "path": "/vmesstcp",
+                        "dest": "@/tmp/xray_vmesstcp.sock"
+                    },
+                    {
+                        "path": "/vmessws",
+                        "dest": "@/tmp/xray_vmessws.sock"
+                    },
+                    {
+                        "dest": "FALLBACK_INFO"
+                    }
+                ]
+            },
+            "streamSettings": {
+                "network": "tcp",
+                "security": "xtls",
+                "xtlsSettings": {
+                    "alpn": [
+                        "h2",
+                        "http/1.1"
+                    ],
+                    "certificates": [
+                        {
+                            "certificateFile": "/config/certificates/cert.crt",
+                            "keyFile": "/config/certificates/priv.key",
+                            "ocspStapling": 3600
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "listen": "@/tmp/xray_ws.sock",
+            "protocol": "vmess",
+            "settings": {
+                "clients": [
+                    {
+                        "id": "Xray_UUID",
+                        "alterId": 0
+                    }
+                ]
+            },
+            "streamSettings": {
+                "network": "ws",
+                "wsSettings": {
+                    "path": "/line"
+                }
+            }
+        },
+        {
+            "listen": "@/tmp/xray_trojan.sock",
+            "protocol": "trojan",
+            "settings": {
+                "clients": [
+                    {
+                        "password": "Xray_UUID",
+                        "level": 0,
+                        "email": ""
+                    }
+                ],
+                "fallbacks": [
+                    {
+                        "dest": "FALLBACK_INFO"
+                    }
+                ]
+            },
+            "streamSettings": {
+                "network": "tcp",
+                "security": "none",
+                "tcpSettings": {
+                }
+            }
+        },
+        {
+            "listen": "@/tmp/xray_websocket.sock",
+            "protocol": "vless",
+            "settings": {
+                "clients": [
+                    {
+                        "id": "Xray_UUID",
+                        "level": 0,
+                        "email": ""
+                    }
+                ],
+                "decryption": "none"
+            },
+            "streamSettings": {
+                "network": "ws",
+                "security": "none",
+                "wsSettings": {
+                    "acceptProxyProtocol": false,
+                    "path": "/websocket"
+                }
+            }
+        },
+        {
+            "listen": "@/tmp/xray_vmesstcp.sock",
+            "protocol": "vmess",
+            "settings": {
+                "clients": [
+                    {
+                        "id": "Xray_UUID",
+                        "level": 0,
+                        "email": ""
+                    }
+                ]
+            },
+            "streamSettings": {
+                "network": "tcp",
+                "security": "none",
+                "tcpSettings": {
+                    "acceptProxyProtocol": false,
+                    "header": {
+                        "type": "http",
+                        "request": {
+                            "path": [
+                                "/vmesstcp"
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "listen": "@/tmp/xray_vmessws.sock",
+            "protocol": "vmess",
+            "settings": {
+                "clients": [
+                    {
+                        "id": "Xray_UUID",
+                        "level": 0,
+                        "email": ""
+                    }
+                ]
+            },
+            "streamSettings": {
+                "network": "ws",
+                "security": "none",
+                "wsSettings": {
+                    "acceptProxyProtocol": false,
+                    "path": "/vmessws"
+                }
+            }
+        },
+        {
+            "port": 8083,
+            "protocol": "vless",
+            "settings": {
+                "clients": [
+                    {
+                        "id": "Xray_UUID",
+                        "level": 0,
+                        "email": ""
+                    }
+                ],
+                "decryption": "none"
+            },
+            "streamSettings": {
+                "network": "kcp",
+                "security": "none",
+                "kcpSettings": {
+                    "mtu": 1350,
+                    "tti": 20,
+                    "uplinkCapacity": 5,
+                    "downlinkCapacity": 20,
+                    "congestion": false,
+                    "readBufferSize": 1,
+                    "writeBufferSize": 1,
+                    "header": {
+                        "type": "none"
+                    },
+                    "seed": "Xray_UUID"
+                }
+            }
+        }
+    ],
+    "outbounds": [
+        {
+            "tag": "direct",
+            "protocol": "freedom",
+            "settings": {}
+        },
+        {
+            "tag": "blocked",
+            "protocol": "blackhole",
+            "settings": {}
+        },
+        {
+            "tag": "dns-out",
+            "protocol": "dns"
+        }
+    ]
+}

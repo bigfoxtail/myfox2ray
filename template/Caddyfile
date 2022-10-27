@@ -1,0 +1,37 @@
+{
+    auto_https disable_redirects
+    order replace after encode
+    servers {
+        protocol {
+            allow_h2c
+        }
+    }
+}
+
+http://CADDY_DOMAIN:80 {
+    log {
+        output file /var/log/caddy.log
+    }
+    route /test/* {
+        uri strip_prefix /test
+        reverse_proxy https://www.github.com {
+            header_up Host {upstream_hostport}
+        }
+    }
+    route /my_portainer/* {
+        uri strip_prefix /my_portainer
+        reverse_proxy portainer:9000
+    }
+    reverse_proxy REVERSE_PROXY_INFO {
+        header_up Host {upstream_hostport}
+    }
+}
+
+:80 {
+    log {
+        output file /var/log/caddy.log
+    }
+    reverse_proxy REVERSE_PROXY_INFO {
+        header_up Host {upstream_hostport}
+    }
+}
