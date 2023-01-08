@@ -2,6 +2,13 @@
 
 cd `dirname $0`
 
+has_root() {
+    if [[ $EUID -ne 0 ]]; then
+        echo "权限需要提升:该程序必须由root或sudo执行" 1>&2
+            exit 1
+    fi
+}
+
 blue(){
     echo -e "\033[36;1m${@}\033[0m"
 }
@@ -59,8 +66,7 @@ function start_menu(){
     ;;
     3)
     docker-compose -f ./server/docker-compose.yml -p "fox2ray" pull
-    docker-compose -f ./server/docker-compose.yml -p "fox2ray" down
-    docker-compose -f ./server/docker-compose.yml -p "fox2ray" up -d
+    docker-compose -f ./server/docker-compose.yml -p "fox2ray" down & docker-compose -f ./server/docker-compose.yml -p "fox2ray" up -d
     ;;
     4)
     docker-compose -f ./server/docker-compose.yml -p "fox2ray" build --pull
@@ -71,8 +77,7 @@ function start_menu(){
     ;;
     6)
     docker-compose -f ./server/docker-compose.yml -p "fox2ray" --profile http pull
-    docker-compose -f ./server/docker-compose.yml -p "fox2ray" --profile http down
-    docker-compose -f ./server/docker-compose.yml -p "fox2ray" --profile http up -d
+    docker-compose -f ./server/docker-compose.yml -p "fox2ray" --profile http down & docker-compose -f ./server/docker-compose.yml -p "fox2ray" --profile http up -d
     ;;
     7)
     docker-compose -f ./server/docker-compose.yml -p "fox2ray" --profile http stop
@@ -93,4 +98,5 @@ function start_menu(){
     start_menu
 }
 
+has_root
 start_menu
