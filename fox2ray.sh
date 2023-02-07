@@ -66,7 +66,8 @@ function start_menu(){
     ;;
     3)
     docker-compose -f ./server/docker-compose.yml -p "fox2ray" pull
-    docker-compose -f ./server/docker-compose.yml -p "fox2ray" down && docker-compose -f ./server/docker-compose.yml -p "fox2ray" up -d
+    docker-compose -f ./server/docker-compose.yml -p "fox2ray" down
+    docker-compose -f ./server/docker-compose.yml -p "fox2ray" up -d
     ;;
     4)
     docker-compose -f ./server/docker-compose.yml -p "fox2ray" build --pull
@@ -77,7 +78,8 @@ function start_menu(){
     ;;
     6)
     docker-compose -f ./server/docker-compose.yml -p "fox2ray" --profile http pull
-    docker-compose -f ./server/docker-compose.yml -p "fox2ray" --profile http down && docker-compose -f ./server/docker-compose.yml -p "fox2ray" --profile http up -d
+    docker-compose -f ./server/docker-compose.yml -p "fox2ray" --profile http down
+    docker-compose -f ./server/docker-compose.yml -p "fox2ray" --profile http up -d
     ;;
     7)
     docker-compose -f ./server/docker-compose.yml -p "fox2ray" --profile http stop
