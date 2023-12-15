@@ -9,8 +9,8 @@ cp ./template/docker-compose-template.yml ./server/docker-compose.yml
 cp ./template/xray_server.json ./server/xray_server.json
 cp ./template/Caddyfile ./server/Caddyfile
 cp ./template/xray_run.sh ./server/xray_run.sh
-cp -r ./template/caddy-docker ./server/caddy-docker
-cp -r ./template/site ./server/site
+cp -r ./template/caddy-docker ./server/
+cp -r ./template/site ./server/
 cp -r ./template/caddy_data/* ./server/caddy_data
 
 DOMAIN=*.flow.qq.com
